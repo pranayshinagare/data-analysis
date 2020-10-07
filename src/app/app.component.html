@@ -1,0 +1,164 @@
+<app-header></app-header>
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="timer"
+  [fullScreen]="true">
+  <p style="color: #fff"> Loading... </p>
+</ngx-spinner>
+<div class="container">
+  <div class="searchWrapper">
+    <form class="col-md-6">
+      <!-- <input id="typeahead-basic" type="text" class="form-control mr-sm-2 f_width"
+        [(ngModel)]="model" [ngbTypeahead]="search" name="searchName"
+        placeholder="Paste your post liink here" />
+      <button class="btn btn-outline-success my-2 my-sm-0 btn-search" type="button"
+        (click)="searchSelectedPost(model)">Go</button> -->
+      <select class="form-control" name="postToSelect"
+        (change)="searchSelectedPost(model)" [(ngModel)]="model">
+        <option *ngFor="let item of posts" value="{{item.id}}">{{item.date}}</option>
+      </select>
+    </form>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 charts">
+      <div class="barChartWrapper" *ngIf="barChartData.length">
+        <app-bar-chart [chartData]="barChartData"></app-bar-chart>
+      </div>
+    </div>
+    <div class="col-md-6 cmts" *ngIf="userComments.length">
+      <div class="pieChartWrapper">
+        <app-pie-chart [chartData]="pieChartData"></app-pie-chart>
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="error_wrapper text-danger">
+    <h4>{{errorMessage}}</h4>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab"
+            href="#nav-home" role="tab" aria-controls="nav-home"
+            aria-selected="true">Asking for Help</a>
+          <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab"
+            href="#nav-profile" role="tab" aria-controls="nav-profile"
+            aria-selected="false">Willing to Help</a>
+          <a class="nav-item nav-link" id="nav-appreciate-tab" data-toggle="tab"
+            href="#appreciate-tab" role="tab" aria-controls="appreciate-tab"
+            aria-selected="false">Appreciate Work</a>
+          <a class="nav-item nav-link" id="nav-suggestion-tab" data-toggle="tab"
+            href="#suggestion-tab" role="tab" aria-controls="suggestion-tab"
+            aria-selected="false">Problem Faced / Suggetions</a>
+          <!-- <a class="nav-item nav-link" id="nav-problem-tab" data-toggle="tab"
+            href="#problem-tab" role="tab" aria-controls="problem-tab"
+            aria-selected="false">Problem Faced</a> -->
+        </div>
+      </nav>
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
+          aria-labelledby="nav-home-tab">
+          <div class="card"
+            *ngFor="let item of askingHelp | slice: (askingTabPage-1) * askingTabPageSize : (askingTabPage-1) * askingTabPageSize + askingTabPageSize">
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>{{item.message}}</p>
+                <footer class="blockquote-footer userName"><a [href]="openPostLink(item.url_link)" target="_blank">{{item.user_id}}</a>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+          <p class="text-center pt-5" *ngIf="!askingHelp.length"><span
+              *ngIf="model == 'Select Post Id'">Please Select Post Id</span> <span
+              *ngIf="model != 'Select Post Id'">Data scanning in
+              progress, Helping Hand might not found the exact data</span></p>
+          <ngb-pagination *ngIf="askingHelp.length" [collectionSize]="askingHelp.length"
+            [(page)]="askingTabPage" [maxSize]="5" [rotate]="true" [ellipses]="false"
+            [boundaryLinks]="true">
+          </ngb-pagination>
+        </div>
+        <div class="tab-pane fade" id="nav-profile" role="tabpanel"
+          aria-labelledby="nav-profile-tab">
+          <div class="card"
+            *ngFor="let item of willingHelp | slice: (willingTabPage-1) * willingTabPageSize : (willingTabPage-1) * willingTabPageSize + willingTabPageSize">
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>{{item.message}}</p>
+                <footer class="blockquote-footer userName"><a [href]="openPostLink(item.url_link)" target="_blank">{{item.user_id}}</a>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+          <p class="text-center pt-5" *ngIf="!willingHelp.length"><span
+              *ngIf="model == 'Select Post Id'">Please Select Post Id</span> <span
+              *ngIf="model != 'Select Post Id'">Data scanning in
+              progress, Helping Hand might not found the exact data</span></p>
+          <ngb-pagination *ngIf="willingHelp.length" [collectionSize]="willingHelp.length"
+            [(page)]="willingTabPage" [maxSize]="5" [rotate]="true" [ellipses]="false"
+            [boundaryLinks]="true">
+          </ngb-pagination>
+        </div>
+        <div class="tab-pane fade" id="appreciate-tab" role="tabpanel"
+          aria-labelledby="nav-appreciate-tab">
+          <div class="card"
+            *ngFor="let item of appreciateList | slice: (appreciateTabPage-1) * appreciateTabPageSize : (appreciateTabPage-1) * appreciateTabPageSize + appreciateTabPageSize">
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>{{item.message}}</p>
+                <footer class="blockquote-footer userName"><a [href]="openPostLink(item.url_link)" target="_blank">{{item.user_id}}</a>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+          <p class="text-center pt-5" *ngIf="!appreciateList.length"><span
+              *ngIf="model == 'Select Post Id'">Please Select Post Id</span> <span
+              *ngIf="model != 'Select Post Id'">Data scanning in
+              progress, Helping Hand might not found the exact data</span></p>
+          <ngb-pagination *ngIf="appreciateList.length"
+            [collectionSize]="appreciateList.length" [(page)]="appreciateTabPage"
+            [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true">
+          </ngb-pagination>
+        </div>
+        <div class="tab-pane fade" id="suggestion-tab" role="tabpanel"
+          aria-labelledby="nav-suggestion-tab">
+          <div class="card"
+            *ngFor="let item of problemList | slice: (suggestionTabPage-1) * suggestionTabPageSize : (suggestionTabPage-1) * suggestionTabPageSize + suggestionTabPageSize">
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>{{item.message}}</p>
+                <footer class="blockquote-footer userName"><a [href]="openPostLink(item.url_link)" target="_blank">{{item.user_id}}</a>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+          <p class="text-center pt-5" *ngIf="!problemList.length"><span
+              *ngIf="model == 'Select Post Id'">Please Select Post Id</span> <span
+              *ngIf="model != 'Select Post Id'">Data scanning in
+              progress, Helping Hand might not found the exact data</span></p>
+          <ngb-pagination *ngIf="problemList.length" [collectionSize]="problemList.length"
+            [(page)]="suggestionTabPage" [maxSize]="5" [rotate]="true" [ellipses]="false"
+            [boundaryLinks]="true">
+          </ngb-pagination>
+        </div>
+        <!-- <div class="tab-pane fade" id="problem-tab" role="tabpanel"
+          aria-labelledby="nav-problem-tab">
+          <div class="card"
+            *ngFor="let item of problemList | slice: (problemTabPage-1) * problemTabPageSize : (problemTabPage-1) * problemTabPageSize + problemTabPageSize">
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>{{item.message}}</p>
+                <footer class="blockquote-footer userName"><a [href]="openPostLink(item.url_link)" target="_blank">{{item.user_id}}</a></footer>
+              </blockquote>
+            </div>
+          </div>
+          <ngb-pagination *ngIf="problemList.length" [collectionSize]="problemList.length"
+            [(page)]="problemTabPage" [maxSize]="5" [rotate]="true" [ellipses]="false"
+            [boundaryLinks]="true">
+          </ngb-pagination>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>
